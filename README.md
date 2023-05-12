@@ -2,19 +2,12 @@
 
 ## 目次
 
-- [環境構築](https://github.com/takapi327/terraform/tree/feature/2021-05-Create-takapi327-account-in-terraform#%E7%92%B0%E5%A2%83%E6%A7%8B%E7%AF%89)
-  - [tfenvのインストール](https://github.com/takapi327/terraform/tree/feature/2021-05-Create-takapi327-account-in-terraform#tfenv%E3%81%AE%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB)
-  - [Terraformのインストール](https://github.com/takapi327/terraform/tree/feature/2021-05-Create-takapi327-account-in-terraform#terraform%E3%81%AE%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB)
-- [AWS Organizations構成環境](https://github.com/takapi327/terraform/tree/feature/2021-05-Create-takapi327-account-in-terraform#aws-organizations%E6%A7%8B%E6%88%90%E7%92%B0%E5%A2%83)
-  - [構築手順](https://github.com/takapi327/terraform/tree/feature/2021-05-Create-takapi327-account-in-terraform#%E6%A7%8B%E7%AF%89%E6%89%8B%E9%A0%86)
-- [デプロイ手順](https://github.com/takapi327/terraform/tree/feature/2021-05-Create-takapi327-account-in-terraform#%E3%83%87%E3%83%97%E3%83%AD%E3%82%A4%E6%89%8B%E9%A0%86)
-- [規約](https://github.com/takapi327/terraform/tree/feature/2021-05-Create-takapi327-account-in-terraform#%E8%A6%8F%E7%B4%84)
-  - [ディレクトリ構造](https://github.com/takapi327/terraform/tree/feature/2021-05-Create-takapi327-account-in-terraform#%E3%83%87%E3%82%A3%E3%83%AC%E3%82%AF%E3%83%88%E3%83%AA%E6%A7%8B%E9%80%A0)
-  - [ファイル命名規則](https://github.com/takapi327/terraform/tree/feature/2021-05-Create-takapi327-account-in-terraform#%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E5%91%BD%E5%90%8D%E8%A6%8F%E5%89%87)
-  - [コーディング規約](https://github.com/takapi327/terraform/tree/feature/2021-05-Create-takapi327-account-in-terraform#%E3%82%B3%E3%83%BC%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E8%A6%8F%E7%B4%84)
-  - [IPアドレス規則](https://github.com/takapi327/terraform/tree/feature/2021-05-Create-takapi327-account-in-terraform#ip%E3%82%A2%E3%83%89%E3%83%AC%E3%82%B9%E8%A6%8F%E5%89%87)
-- [アカウント一覧](https://github.com/takapi327/terraform/tree/feature/2021-05-Create-takapi327-account-in-terraform#%E3%82%A2%E3%82%AB%E3%82%A6%E3%83%B3%E3%83%88%E4%B8%80%E8%A6%A7)
-  - [Sample Angular SSR](https://github.com/takapi327/terraform/tree/feature/2021-05-Create-takapi327-account-in-terraform#sample-angular-ssr)
+- [環境構築](https://github.com/takapi327/nextbeat_terrafrom/tree/feature/2021-05-Create-takapi327-account-in-terraform#%E7%92%B0%E5%A2%83%E6%A7%8B%E7%AF%89)
+  - [tfenvのインストール](https://github.com/takapi327/nextbeat_terrafrom/tree/feature/2021-05-Create-takapi327-account-in-terraform#tfenv%E3%81%AE%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB)
+  - [Terraformのインストール](https://github.com/takapi327/nextbeat_terrafrom/tree/feature/2021-05-Create-takapi327-account-in-terraform#terraform%E3%81%AE%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB)
+- [AWS Organizations構成環境](https://github.com/takapi327/nextbeat_terrafrom/tree/feature/2021-05-Create-takapi327-account-in-terraform#aws-organizations%E6%A7%8B%E6%88%90%E7%92%B0%E5%A2%83)
+  - [構築手順](https://github.com/takapi327/nextbeat_terrafrom/tree/feature/2021-05-Create-takapi327-account-in-terraform#%E6%A7%8B%E7%AF%89%E6%89%8B%E9%A0%86)
+- [デプロイ手順](https://github.com/takapi327/nextbeat_terrafrom/tree/feature/2021-05-Create-takapi327-account-in-terraform#%E3%83%87%E3%83%97%E3%83%AD%E3%82%A4%E6%89%8B%E9%A0%86)
 
 ## 環境構築
 
