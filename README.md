@@ -49,7 +49,7 @@ TerraformのStateファイルはTerraform Cloudで管理しています。
 
 SSOの認証情報を用いてTerraformを実行する
 
-1. [Single Sign-On](https://d-95671f160a.awsapps.com/start#/)ページにアクセス
+1. Single Sign-Onページにアクセス
 2. Azure AD認証(ログイン済みの場合はなし)
 3. 任意のアカウント・プロジェクト・環境を選択
 4. 任意の権限で、「Command line or programmatic access」を選択し、「Option 1: Set AWS environment variables」から環境変数をコピー
