@@ -56,5 +56,3 @@ SSOの認証情報を用いてTerraformを実行する
 5. 実行したいTerraformのプロジェクト直下のコンソールで、コピーした環境変数を設定(ペースト)
 6. terraform init実行(初回のみ)
 7. terraform plan or apply 実行
-
-![スクリーンショット 2021-05-16 12 06 49](https://user-images.githubusercontent.com/57429437/118384205-339c2c80-b63f-11eb-9601-7ec5492382e7.png)
