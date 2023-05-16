@@ -5,6 +5,6 @@ resource "aws_vpc" "product_a_vpc" {
   instance_tenancy     = "default"
 
   tags = {
-    Name: "productA"
+    Name : "productA"
   }
 }
