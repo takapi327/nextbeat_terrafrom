@@ -1,15 +1,3 @@
-data "terraform_remote_state" "platform" {
-  backend = "remote"
-
-  config = {
-    organization = "takapi327"
-
-    workspaces = {
-      name = "platform"
-    }
-  }
-}
-
 resource "aws_vpclattice_service_network_vpc_association" "vpc_association" {
   vpc_identifier             = aws_vpc.product_a_vpc.id
   service_network_identifier = data.terraform_remote_state.platform.outputs.microservice_network_id
