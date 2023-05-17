@@ -16,3 +16,17 @@ terraform {
     }
   }
 }
+
+data aws_caller_identity current {}
+
+data "terraform_remote_state" "platform" {
+  backend = "remote"
+
+  config = {
+    organization = "takapi327"
+
+    workspaces = {
+      name = "platform"
+    }
+  }
+}

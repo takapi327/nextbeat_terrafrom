@@ -1,3 +1,8 @@
+variable "region" {
+  description = "AWS region"
+  default     = "ap-northeast-1"
+}
+
 variable "vpc_ips" {
   description = "List of VPC IPs for accounts managed under Organization"
   type        = map(any)
