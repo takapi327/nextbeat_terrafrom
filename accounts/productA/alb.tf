@@ -61,7 +61,7 @@ resource "aws_lb_listener_rule" "product_a_alb_80_rule" {
   condition {
     http_header {
       http_header_name = "X-From-Restriction-Cloudfront"
-      values           = ["xVm!#bGr32.n"]
+      values           = [var.cloudfront_custom_header]
     }
   }
 
