@@ -41,6 +41,9 @@ resource "aws_ecs_task_definition" "fargate_spot_task" {
       image             = "${data.aws_caller_identity.current.id}.dkr.ecr.ap-northeast-1.amazonaws.com/${aws_ecr_repository.jvm_microservice_server.name}:latest"
       memoryReservation = 1024
       name              = aws_ecr_repository.jvm_microservice_server.name
+      healthCheck = {
+        command = ["CMD-SHELL", "/bin/grpc_health_probe -addr=:9999 || exit 1"]
+      }
       environment = [
         {
           name  = "TZ"

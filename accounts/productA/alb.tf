@@ -32,19 +32,19 @@ resource "aws_lb_target_group" "product_a_alb_target_group" {
   name                 = "productA-target-group"
   port                 = 80
   protocol             = "HTTP"
+  protocol_version     = "GRPC"
   deregistration_delay = "300"
   proxy_protocol_v2    = false
   vpc_id               = aws_vpc.product_a_vpc.id
   target_type          = "ip"
 
   health_check {
-    path                = "/healthcheck"
+    path                = "/com.example.grpc.health.Health/Check"
     healthy_threshold   = 5
     interval            = 30
     unhealthy_threshold = 2
-    matcher             = "200"
+    matcher             = "0"
     port                = "traffic-port"
-    protocol            = "HTTP"
     timeout             = 5
   }
 }
