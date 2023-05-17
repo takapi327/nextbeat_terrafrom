@@ -1,13 +1,13 @@
-resource aws_ecs_cluster product_a_cluster {
+resource "aws_ecs_cluster" "product_a_cluster" {
   name = "productA-cluster"
 }
 
-resource aws_service_discovery_private_dns_namespace product_a_service_discovery_namespace {
+resource "aws_service_discovery_private_dns_namespace" "product_a_service_discovery_namespace" {
   name = "productA.internal"
   vpc  = aws_vpc.product_a_vpc.id
 }
 
-resource aws_service_discovery_service product_a_service_discovery {
+resource "aws_service_discovery_service" "product_a_service_discovery" {
   name = "service"
 
   dns_config {
@@ -26,7 +26,7 @@ resource aws_service_discovery_service product_a_service_discovery {
   }
 }
 
-resource aws_ecs_task_definition fargate_spot_task {
+resource "aws_ecs_task_definition" "fargate_spot_task" {
   family                   = aws_ecr_repository.jvm_microservice_server.name
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
@@ -41,7 +41,7 @@ resource aws_ecs_task_definition fargate_spot_task {
       image             = "${data.aws_caller_identity.current.id}.dkr.ecr.ap-northeast-1.amazonaws.com/${aws_ecr_repository.jvm_microservice_server.name}:latest"
       memoryReservation = 1024
       name              = aws_ecr_repository.jvm_microservice_server.name
-      environment       = [
+      environment = [
         {
           name  = "TZ"
           value = "Asia/Tokyo"
@@ -49,7 +49,7 @@ resource aws_ecs_task_definition fargate_spot_task {
       ]
       logConfiguration = {
         logDriver = "awslogs"
-        options   = {
+        options = {
           awslogs-group         = aws_cloudwatch_log_group.ecs.name
           awslogs-stream-prefix = aws_ecr_repository.jvm_microservice_server.name
           awslogs-region        = var.region
