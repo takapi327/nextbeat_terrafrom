@@ -11,19 +11,16 @@ resource "aws_alb" "product_a_alb" {
   ]
 }
 
-resource "aws_lb_listener" "product_a_alb_80" {
+resource "aws_lb_listener" "product_a_alb_443" {
   load_balancer_arn = aws_alb.product_a_alb.arn
-  port              = 80
-  protocol          = "HTTP"
+  port              = 443
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = aws_acm_certificate.product_a_acm.arn
 
   default_action {
-    type = "fixed-response"
-
-    fixed_response {
-      content_type = "text/plain"
-      status_code  = "403"
-      message_body = "Connection is not allowed."
-    }
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.product_a_alb_target_group.arn
   }
 }
 
@@ -49,8 +46,8 @@ resource "aws_lb_target_group" "product_a_alb_target_group" {
   }
 }
 
-resource "aws_lb_listener_rule" "product_a_alb_80_rule" {
-  listener_arn = aws_lb_listener.product_a_alb_80.arn
+resource "aws_lb_listener_rule" "product_a_alb_443_rule" {
+  listener_arn = aws_lb_listener.product_a_alb_443.arn
   priority     = 1
 
   action {
@@ -85,34 +82,15 @@ resource "aws_alb" "product_a_internal_alb" {
   ]
 }
 
-resource "aws_lb_listener" "product_a_internal_alb_80" {
+resource "aws_lb_listener" "product_a_internal_alb_443" {
   load_balancer_arn = aws_alb.product_a_internal_alb.arn
-  port              = 80
-  protocol          = "HTTP"
+  port              = 443
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = aws_acm_certificate.product_a_acm.arn
 
   default_action {
-    type = "fixed-response"
-
-    fixed_response {
-      content_type = "text/plain"
-      status_code  = "403"
-      message_body = "Connection is not allowed."
-    }
-  }
-}
-
-resource "aws_lb_listener_rule" "product_a_internal_alb_80_rule" {
-  listener_arn = aws_lb_listener.product_a_internal_alb_80.arn
-  priority     = 1
-
-  action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.product_a_alb_target_group.arn
-  }
-
-  condition {
-    path_pattern {
-      values = ["*"]
-    }
   }
 }
