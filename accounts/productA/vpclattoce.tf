@@ -15,3 +15,39 @@ resource "aws_vpclattice_service_network_service_association" "microservice_netw
   service_identifier         = aws_vpclattice_service.product_a_service.id
   service_network_identifier = data.terraform_remote_state.platform.outputs.microservice_network_id
 }
+
+resource "aws_vpclattice_target_group" "product_a_service_target" {
+  name = "product-a-service-target"
+  type = "IP"
+
+  config {
+    port             = 80
+    protocol         = "HTTP"
+    vpc_identifier   = aws_vpc.product_a_vpc.id
+    protocol_version = "GRPC"
+  }
+}
+
+resource "aws_vpclattice_target_group_attachment" "product_a_service_target_attachment" {
+  target_group_identifier = aws_vpclattice_target_group.product_a_service_target.id
+
+  target {
+    id   = data.aws_network_interface.product_a_internal_nlb_network_interface.private_ip
+    port = 80
+  }
+}
+
+resource "aws_vpclattice_listener" "product_a_service_listener" {
+  name               = "product-a-service-listener"
+  protocol           = "HTTPS"
+  port               = 443
+  service_identifier = aws_vpclattice_service.product_a_service.id
+
+  default_action {
+    forward {
+      target_groups {
+        target_group_identifier = aws_vpclattice_target_group.product_a_service_target.id
+      }
+    }
+  }
+}
