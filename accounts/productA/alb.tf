@@ -1,96 +1,37 @@
-resource "aws_alb" "product_a_alb" {
-  name               = "productA"
-  internal           = false
-  load_balancer_type = "application"
-  security_groups    = [aws_security_group.sg_alb.id, aws_vpc.product_a_vpc.default_security_group_id]
-  subnets            = [aws_subnet.sn_global_stg_1.id, aws_subnet.sn_global_stg_2.id]
+resource "aws_alb" "product_a_internal_nlb" {
+  name               = "productA-internal"
+  internal           = true
+  load_balancer_type = "network"
+  subnets            = [aws_subnet.sn_private_stg_1.id]
 
   enable_deletion_protection = false
+
   depends_on = [
     aws_vpc.product_a_vpc
   ]
 }
 
-resource "aws_lb_listener" "product_a_alb_443" {
-  load_balancer_arn = aws_alb.product_a_alb.arn
-  port              = 443
-  protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = aws_acm_certificate.product_a_acm.arn
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.product_a_alb_target_group.arn
-  }
-}
-
-
-resource "aws_lb_target_group" "product_a_alb_target_group" {
+resource "aws_lb_target_group" "product_a_nlb_target_group" {
   name                 = "productA-target-group"
   port                 = 80
-  protocol             = "HTTP"
-  protocol_version     = "GRPC"
+  protocol             = "TCP"
   deregistration_delay = "300"
   proxy_protocol_v2    = false
   vpc_id               = aws_vpc.product_a_vpc.id
   target_type          = "ip"
 
   health_check {
-    path                = "/com.example.grpc.health.Health/Check"
-    healthy_threshold   = 5
-    interval            = 30
-    unhealthy_threshold = 2
-    matcher             = "0"
-    port                = "traffic-port"
-    timeout             = 5
+    protocol = "TCP"
   }
 }
 
-resource "aws_lb_listener_rule" "product_a_alb_443_rule" {
-  listener_arn = aws_lb_listener.product_a_alb_443.arn
-  priority     = 1
-
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.product_a_alb_target_group.arn
-  }
-
-  condition {
-    http_header {
-      http_header_name = "X-From-Restriction-Cloudfront"
-      values           = [var.cloudfront_custom_header]
-    }
-  }
-
-  condition {
-    path_pattern {
-      values = ["*"]
-    }
-  }
-}
-
-resource "aws_alb" "product_a_internal_alb" {
-  name               = "productA-internal"
-  internal           = true
-  load_balancer_type = "application"
-  security_groups    = [aws_security_group.sg_alb.id, aws_vpc.product_a_vpc.default_security_group_id]
-  subnets            = [aws_subnet.sn_global_stg_1.id, aws_subnet.sn_global_stg_2.id]
-
-  enable_deletion_protection = false
-  depends_on = [
-    aws_vpc.product_a_vpc
-  ]
-}
-
-resource "aws_lb_listener" "product_a_internal_alb_443" {
-  load_balancer_arn = aws_alb.product_a_internal_alb.arn
-  port              = 443
-  protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = aws_acm_certificate.product_a_acm.arn
+resource "aws_lb_listener" "product_a_internal_nlb_443" {
+  load_balancer_arn = aws_alb.product_a_internal_nlb.arn
+  port              = 80
+  protocol          = "TCP"
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.product_a_alb_target_group.arn
+    target_group_arn = aws_lb_target_group.product_a_nlb_target_group.arn
   }
 }
