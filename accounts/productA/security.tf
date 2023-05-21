@@ -51,13 +51,15 @@ resource "aws_security_group" "sg_ecs" {
   }
 }
 
-resource "aws_security_group_rule" "sg_ecs_for_alb_rule" {
-  security_group_id        = aws_security_group.sg_ecs.id
-  type                     = "ingress"
-  from_port                = 0
-  to_port                  = 65535
-  protocol                 = "tcp"
-  source_security_group_id = aws_security_group.sg_alb.id
+resource "aws_security_group_rule" "sg_ecs_for_subnet" {
+  security_group_id = aws_security_group.sg_ecs.id
+  type              = "ingress"
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "tcp"
+  cidr_blocks       = [
+    aws_subnet.sn_private_stg_1.cidr_block
+  ]
 }
 
 resource "aws_security_group_rule" "sg_ecs_egress_rule" {
