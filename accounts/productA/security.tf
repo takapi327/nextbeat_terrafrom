@@ -62,6 +62,28 @@ resource "aws_security_group_rule" "sg_ecs_for_subnet" {
   ]
 }
 
+data "aws_ec2_managed_prefix_list" "vpclattice" {
+  name = "com.amazonaws.${var.region}.vpc-lattice"
+}
+
+resource "aws_security_group_rule" "sg_ecs_for_80_prefix_list" {
+  security_group_id = aws_security_group.sg_ecs.id
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  prefix_list_ids   = [data.aws_ec2_managed_prefix_list.vpclattice.id]
+}
+
+resource "aws_security_group_rule" "sg_ecs_for_443_prefix_list" {
+  security_group_id = aws_security_group.sg_ecs.id
+  type              = "ingress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  prefix_list_ids   = [data.aws_ec2_managed_prefix_list.vpclattice.id]
+}
+
 resource "aws_security_group_rule" "sg_ecs_egress_rule" {
   security_group_id = aws_security_group.sg_ecs.id
   type              = "egress"
