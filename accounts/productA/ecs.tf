@@ -42,7 +42,7 @@ resource "aws_ecs_task_definition" "fargate_spot_task" {
       memoryReservation = 1024
       name              = aws_ecr_repository.jvm_microservice_server.name
       healthCheck = {
-        command = ["CMD-SHELL", "/bin/grpc_health_probe -addr=:9999 || exit 1"]
+        command = ["CMD-SHELL", "/bin/grpc_health_probe -addr=:9000 -service=healthservice || exit 1"]
       }
       environment = [
         {
@@ -70,4 +70,56 @@ resource "aws_ecs_task_definition" "fargate_spot_task" {
       ]
     }
   ])
+}
+
+
+resource "aws_ecs_service" "product_a_service" {
+  name             = aws_ecr_repository.jvm_microservice_server.name
+  cluster          = aws_ecs_cluster.product_a_cluster.id
+  desired_count    = 1
+  platform_version = "LATEST"
+
+  enable_execute_command             = true
+  deployment_maximum_percent         = 200
+  deployment_minimum_healthy_percent = 50
+
+  deployment_controller {
+    type = "ECS"
+  }
+
+  tags = {}
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.product_a_nlb_target_group.arn
+    container_name   = aws_ecr_repository.jvm_microservice_server.name
+    container_port   = 9000
+  }
+
+  network_configuration {
+    subnets          = [ aws_subnet.sn_private_stg_1.id ]
+    security_groups  = [ aws_security_group.sg_ecs.id ]
+    assign_public_ip = true
+  }
+
+  service_registries {
+    container_port = 0
+    port           = 0
+    registry_arn   = aws_service_discovery_service.product_a_service_discovery.arn
+  }
+
+  task_definition = aws_ecs_task_definition.fargate_spot_task.arn
+
+  capacity_provider_strategy {
+    base              = 0
+    capacity_provider = "FARGATE_SPOT"
+    weight            = 1
+  }
+
+  health_check_grace_period_seconds = 0
+  lifecycle {
+    ignore_changes = [
+      desired_count,
+      task_definition
+    ]
+  }
 }
