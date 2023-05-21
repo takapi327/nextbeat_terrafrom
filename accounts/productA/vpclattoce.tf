@@ -8,7 +8,12 @@ resource "aws_vpclattice_service_network_vpc_association" "vpc_association" {
 
 resource "aws_vpclattice_service" "product_a_service" {
   name      = "product-a-service"
-  auth_type = "AWS_IAM"
+  auth_type = "NONE"
+}
+
+resource "aws_vpclattice_access_log_subscription" "product_a_service_access_log" {
+  resource_identifier = aws_vpclattice_service.product_a_service.id
+  destination_arn     = aws_cloudwatch_log_group.vpclattice_service.arn
 }
 
 resource "aws_vpclattice_service_network_service_association" "microservice_network_association" {
