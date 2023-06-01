@@ -70,8 +70,13 @@ resource "aws_ecs_task_definition" "fargate_spot_task" {
       ]
     }
   ])
-}
 
+  lifecycle {
+    ignore_changes = [
+      container_definitions
+    ]
+  }
+}
 
 resource "aws_ecs_service" "product_a_service" {
   name             = aws_ecr_repository.jvm_microservice_server.name
