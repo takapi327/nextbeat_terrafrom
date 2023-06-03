@@ -2,7 +2,7 @@ resource "aws_alb" "product_a_internal_nlb" {
   name               = "productA-internal"
   internal           = true
   load_balancer_type = "network"
-  subnets            = [aws_subnet.sn_private_stg_1.id]
+  subnets            = [aws_subnet.sn_private_1.id]
 
   enable_deletion_protection = false
 

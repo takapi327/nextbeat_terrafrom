@@ -6,7 +6,7 @@ resource "aws_subnet" "sn_global_1" {
   map_public_ip_on_launch = false
 
   tags = {
-    Name : "sn-global-stg-1"
+    Name : "sn-global-1"
   }
 }
 
@@ -17,7 +17,7 @@ resource "aws_subnet" "sn_global_2" {
   map_public_ip_on_launch = false
 
   tags = {
-    Name : "sn-global-stg-2"
+    Name : "sn-global-2"
   }
 }
 
@@ -28,7 +28,7 @@ resource "aws_subnet" "sn_global_3" {
   map_public_ip_on_launch = false
 
   tags = {
-    Name : "sn-global-stg-3"
+    Name : "sn-global-3"
   }
 }
 
@@ -40,7 +40,7 @@ resource "aws_subnet" "sn_private_1" {
   map_public_ip_on_launch = false
 
   tags = {
-    Name : "sn-private-stg-1"
+    Name : "sn-private-1"
   }
 }
 
@@ -51,7 +51,7 @@ resource "aws_subnet" "sn_private_2" {
   map_public_ip_on_launch = false
 
   tags = {
-    Name : "sn-private-stg-2"
+    Name : "sn-private-2"
   }
 }
 
@@ -62,6 +62,6 @@ resource "aws_subnet" "sn_private_3" {
   map_public_ip_on_launch = false
 
   tags = {
-    Name : "sn-private-stg-3"
+    Name : "sn-private-3"
   }
 }

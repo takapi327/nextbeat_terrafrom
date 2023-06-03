@@ -58,7 +58,7 @@ resource "aws_security_group_rule" "sg_ecs_for_subnet" {
   to_port           = 65535
   protocol          = "tcp"
   cidr_blocks       = [
-    aws_subnet.sn_private_stg_1.cidr_block
+    aws_subnet.sn_private_1.cidr_block
   ]
 }
 

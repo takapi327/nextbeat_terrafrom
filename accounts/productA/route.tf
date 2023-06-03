@@ -8,23 +8,23 @@ resource "aws_route_table" "rtb_global" {
   }
 
   tags = {
-    Name : "rtb-global-stg"
+    Name : "rtb-global"
   }
 }
 
 resource "aws_route_table_association" "global_1" {
   route_table_id = aws_route_table.rtb_global.id
-  subnet_id      = aws_subnet.sn_global_stg_1.id
+  subnet_id      = aws_subnet.sn_global_1.id
 }
 
 resource "aws_route_table_association" "global_2" {
   route_table_id = aws_route_table.rtb_global.id
-  subnet_id      = aws_subnet.sn_global_stg_2.id
+  subnet_id      = aws_subnet.sn_global_2.id
 }
 
 resource "aws_route_table_association" "global_3" {
   route_table_id = aws_route_table.rtb_global.id
-  subnet_id      = aws_subnet.sn_global_stg_3.id
+  subnet_id      = aws_subnet.sn_global_3.id
 }
 
 // ---------- [ Private Route Table ] -------------------------------
@@ -37,21 +37,21 @@ resource "aws_route_table" "rtb_private" {
   }
 
   tags = {
-    Name : "rtb-private-stg"
+    Name : "rtb-private"
   }
 }
 
 resource "aws_route_table_association" "private_1" {
   route_table_id = aws_route_table.rtb_private.id
-  subnet_id      = aws_subnet.sn_private_stg_1.id
+  subnet_id      = aws_subnet.sn_private_1.id
 }
 
 resource "aws_route_table_association" "private_2" {
   route_table_id = aws_route_table.rtb_private.id
-  subnet_id      = aws_subnet.sn_private_stg_2.id
+  subnet_id      = aws_subnet.sn_private_2.id
 }
 
 resource "aws_route_table_association" "private_3" {
   route_table_id = aws_route_table.rtb_private.id
-  subnet_id      = aws_subnet.sn_private_stg_3.id
+  subnet_id      = aws_subnet.sn_private_3.id
 }
