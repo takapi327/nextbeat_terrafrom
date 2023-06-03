@@ -1,5 +1,5 @@
 // ---------- [ Global Subnet ] -------------------------------
-resource "aws_subnet" "sn_global_stg_1" {
+resource "aws_subnet" "sn_global_1" {
   cidr_block              = var.product_a_subnet_ips.a_global
   vpc_id                  = aws_vpc.product_a_vpc.id
   availability_zone       = "ap-northeast-1a"
@@ -10,7 +10,7 @@ resource "aws_subnet" "sn_global_stg_1" {
   }
 }
 
-resource "aws_subnet" "sn_global_stg_2" {
+resource "aws_subnet" "sn_global_2" {
   cidr_block              = var.product_a_subnet_ips.b_global
   vpc_id                  = aws_vpc.product_a_vpc.id
   availability_zone       = "ap-northeast-1d"
@@ -21,7 +21,7 @@ resource "aws_subnet" "sn_global_stg_2" {
   }
 }
 
-resource "aws_subnet" "sn_global_stg_3" {
+resource "aws_subnet" "sn_global_3" {
   cidr_block              = var.product_a_subnet_ips.c_global
   vpc_id                  = aws_vpc.product_a_vpc.id
   availability_zone       = "ap-northeast-1c"
@@ -33,7 +33,7 @@ resource "aws_subnet" "sn_global_stg_3" {
 }
 
 // ---------- [ Private Subnet ] -------------------------------
-resource "aws_subnet" "sn_private_stg_1" {
+resource "aws_subnet" "sn_private_1" {
   cidr_block              = var.product_a_subnet_ips.a_private
   vpc_id                  = aws_vpc.product_a_vpc.id
   availability_zone       = "ap-northeast-1a"
@@ -44,7 +44,7 @@ resource "aws_subnet" "sn_private_stg_1" {
   }
 }
 
-resource "aws_subnet" "sn_private_stg_2" {
+resource "aws_subnet" "sn_private_2" {
   cidr_block              = var.product_a_subnet_ips.b_private
   vpc_id                  = aws_vpc.product_a_vpc.id
   availability_zone       = "ap-northeast-1d"
@@ -55,7 +55,7 @@ resource "aws_subnet" "sn_private_stg_2" {
   }
 }
 
-resource "aws_subnet" "sn_private_stg_3" {
+resource "aws_subnet" "sn_private_3" {
   cidr_block              = var.product_a_subnet_ips.c_private
   vpc_id                  = aws_vpc.product_a_vpc.id
   availability_zone       = "ap-northeast-1c"
