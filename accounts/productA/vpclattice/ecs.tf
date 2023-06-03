@@ -1,10 +1,10 @@
-resource "aws_ecs_cluster" "product_a_cluster" {
-  name = "productA-cluster"
+resource "aws_ecs_cluster" "vpclattice_cluster" {
+  name = "vpclattice-cluster"
 }
 
 resource "aws_service_discovery_private_dns_namespace" "product_a_service_discovery_namespace" {
   name = "productA.internal"
-  vpc  = aws_vpc.product_a_vpc.id
+  vpc  = data.terraform_remote_state.product_a.outputs.product_a_vpc_id
 }
 
 resource "aws_service_discovery_service" "product_a_service_discovery" {
@@ -80,7 +80,7 @@ resource "aws_ecs_task_definition" "fargate_spot_task" {
 
 resource "aws_ecs_service" "product_a_service" {
   name             = aws_ecr_repository.jvm_microservice_server.name
-  cluster          = aws_ecs_cluster.product_a_cluster.id
+  cluster          = aws_ecs_cluster.vpclattice_cluster.id
   desired_count    = 1
   platform_version = "LATEST"
 
@@ -101,7 +101,7 @@ resource "aws_ecs_service" "product_a_service" {
   }
 
   network_configuration {
-    subnets          = [ aws_subnet.sn_private_stg_1.id ]
+    subnets          = [ data.terraform_remote_state.product_a.outputs.sn_private_1_id ]
     security_groups  = [ aws_security_group.sg_ecs.id ]
     assign_public_ip = true
   }

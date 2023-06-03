@@ -1,9 +1,5 @@
-output "jvm_microservice_server_repository" {
-  value = aws_ecr_repository.jvm_microservice_server.name
-}
-
-output "product_a_cluster_id" {
-  value = aws_ecs_cluster.product_a_cluster.id
+output "product_a_vpc_id" {
+  value = aws_vpc.product_a_vpc.id
 }
 
 output "sn_private_1_id" {
@@ -18,6 +14,6 @@ output "sn_private_3_id" {
   value = aws_subnet.sn_private_3.id
 }
 
-output "sg_ecs_id" {
-  value = aws_security_group.sg_ecs.id
+output "sn_private_1_cidr_block" {
+  value = aws_subnet.sn_private_1.cidr_block
 }

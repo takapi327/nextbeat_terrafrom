@@ -8,15 +8,3 @@ resource "aws_vpc" "product_a_vpc" {
     Name : "productA"
   }
 }
-
-data "aws_network_interface" "product_a_internal_nlb_network_interface" {
-  filter {
-    name   = "description"
-    values = ["ELB ${aws_alb.product_a_internal_nlb.arn_suffix}"]
-  }
-
-  filter {
-    name   = "subnet-id"
-    values = [aws_subnet.sn_private_1.id, aws_subnet.sn_private_1.id]
-  }
-}
