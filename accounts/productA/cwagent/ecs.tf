@@ -82,8 +82,8 @@ resource "aws_ecs_task_definition" "jvm_server" {
   family                   = aws_ecr_repository.jvm_server.name
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
-  task_role_arn            = aws_iam_role.cwagent_ecs_task_role.arn
-  execution_role_arn       = aws_iam_role.cwagent_ecs_execution_role.arn
+  task_role_arn            = aws_iam_role.ecs_execution_role.arn
+  execution_role_arn       = aws_iam_role.ecs_execution_role.arn
   cpu                      = 512
   memory                   = 1024
   container_definitions = jsonencode([

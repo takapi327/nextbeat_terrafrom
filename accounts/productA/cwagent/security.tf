@@ -60,6 +60,17 @@ resource "aws_security_group_rule" "sg_cwagent_ecs_for_alb" {
   source_security_group_id = aws_security_group.sg_cwagent_alb.id
 }
 
+resource "aws_security_group_rule" "sg_ecs_for_subnet" {
+  security_group_id = aws_security_group.sg_cwagent_ecs.id
+  type              = "ingress"
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "tcp"
+  cidr_blocks       = [
+    data.terraform_remote_state.product_a.outputs.sn_private_1_cidr_block
+  ]
+}
+
 resource "aws_security_group_rule" "sgcwagent__ecs_egress_rule" {
   security_group_id = aws_security_group.sg_cwagent_ecs.id
   type              = "egress"
