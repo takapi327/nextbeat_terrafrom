@@ -20,7 +20,7 @@ resource "aws_ssm_parameter" "cloudwatch_agent_config" {
               {
                 sd_job_name : "ecs-jvm",
                 sd_metrics_ports : "9090",
-                sd_task_definition_arn_pattern : ".*:task-definition/.*jvm-microservice-server.*:[0-9]+",
+                sd_task_definition_arn_pattern : ".*:task-definition/.*${aws_ecr_repository.jvm_server.name}.*:[0-9]+",
                 sd_metrics_path : "/stats/prometheus"
               }
             ]
