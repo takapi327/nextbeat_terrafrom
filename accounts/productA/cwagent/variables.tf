@@ -15,5 +15,10 @@ variable "product_a_subnet_ips" {
 
 variable "home_wifi" {
   description = "List of Home WIFI IPs"
-  type = map(any)
+  type        = map(any)
+}
+
+variable "cloudfront_custom_header" {
+  description = "Custom header values used by CloudFront and ALB"
+  type        = string
 }

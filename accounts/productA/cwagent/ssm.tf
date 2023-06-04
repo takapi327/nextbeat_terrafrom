@@ -1,38 +1,38 @@
 resource "aws_ssm_parameter" "cloudwatch_agent_prometheus_config" {
-  name = "cloudwatchAgentPrometheusConfig"
-  type = "String"
-  value = "${file("./prometheus_config.txt")}"
+  name  = "cloudwatchAgentPrometheusConfig"
+  type  = "String"
+  value = file("./prometheus_config.txt")
 }
 
 resource "aws_ssm_parameter" "cloudwatch_agent_config" {
   name = "cloudwatchAgentConfig"
   type = "String"
   value = jsonencode({
-    logs: {
-      metrics_collected: {
-        prometheus: {
-          prometheus_config_path: "env:PROMETHEUS_CONFIG_CONTENT",
-          ecs_service_discovery: {
-            sd_frequency: "1m",
-            sd_result_file: "/tmp/cwagent_ecs_auto_sd.yaml",
-            docker_label: {},
-            task_definition_list: [
+    logs : {
+      metrics_collected : {
+        prometheus : {
+          prometheus_config_path : "env:PROMETHEUS_CONFIG_CONTENT",
+          ecs_service_discovery : {
+            sd_frequency : "1m",
+            sd_result_file : "/tmp/cwagent_ecs_auto_sd.yaml",
+            docker_label : {},
+            task_definition_list : [
               {
-                sd_job_name: "ecs-jvm",
-                sd_metrics_ports: "9090",
-                sd_task_definition_arn_pattern: ".*:task-definition/.*jvm-microservice-server.*:[0-9]+",
-                sd_metrics_path: "/stats/prometheus"
+                sd_job_name : "ecs-jvm",
+                sd_metrics_ports : "9090",
+                sd_task_definition_arn_pattern : ".*:task-definition/.*jvm-microservice-server.*:[0-9]+",
+                sd_metrics_path : "/stats/prometheus"
               }
             ]
           },
-          emf_processor: {
-            metric_namespace: "CWAgent",
-            metric_declaration: [
+          emf_processor : {
+            metric_namespace : "CWAgent",
+            metric_declaration : [
               {
-                source_labels: ["container_name"],
-                label_matcher: "^${aws_ecr_repository.jvm_server.name}$",
-                dimensions: [["ClusterName","TaskDefinitionFamily"]],
-                metric_selectors: [
+                source_labels : ["container_name"],
+                label_matcher : "^${aws_ecr_repository.jvm_server.name}$",
+                dimensions : [["ClusterName", "TaskDefinitionFamily"]],
+                metric_selectors : [
                   "^jvm_classes_loaded",
                   "^jvm_threads_current",
                   "^jvm_threads_daemon",
@@ -51,18 +51,18 @@ resource "aws_ssm_parameter" "cloudwatch_agent_config" {
                 ]
               },
               {
-                source_labels: ["container_name"],
-                label_matcher: "^${aws_ecr_repository.jvm_server.name}$",
-                dimensions: [["ClusterName","TaskDefinitionFamily","area"]],
-                metric_selectors: [
+                source_labels : ["container_name"],
+                label_matcher : "^${aws_ecr_repository.jvm_server.name}$",
+                dimensions : [["ClusterName", "TaskDefinitionFamily", "area"]],
+                metric_selectors : [
                   "^jvm_memory_bytes_used"
                 ]
               },
               {
-                source_labels: ["container_name"],
-                label_matcher: "^${aws_ecr_repository.jvm_server.name}$",
-                dimensions: [["ClusterName","TaskDefinitionFamily","pool"]],
-                metric_selectors: [
+                source_labels : ["container_name"],
+                label_matcher : "^${aws_ecr_repository.jvm_server.name}$",
+                dimensions : [["ClusterName", "TaskDefinitionFamily", "pool"]],
+                metric_selectors : [
                   "^jvm_memory_pool_bytes_used"
                 ]
               }
@@ -70,7 +70,7 @@ resource "aws_ssm_parameter" "cloudwatch_agent_config" {
           }
         }
       },
-      force_flush_interval: 5
+      force_flush_interval : 5
     }
   })
 }
