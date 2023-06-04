@@ -61,7 +61,8 @@ data "aws_iam_policy_document" "assume" {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
       values   = [
-        "repo:takapi327/grpc-sample-projects:*"
+        "repo:takapi327/grpc-sample-projects:*",
+        "repo:takapi327/jvm-measurement-example:*"
       ]
     }
 
