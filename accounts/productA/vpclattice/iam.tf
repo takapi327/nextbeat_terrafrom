@@ -64,7 +64,15 @@ resource "aws_iam_role_policy_attachment" "ecs_execution_role_policy_attachment"
 /**
  * Lambda関数用ロール
  */
+data "aws_iam_policy" "lambda_basic_execution_role_policy" {
+  arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
 data "aws_iam_policy_document" "assume_role_for_lambda" {
+  source_policy_documents = [
+    data.aws_iam_policy.lambda_basic_execution_role_policy.policy
+  ]
+
   statement {
     effect = "Allow"
 
