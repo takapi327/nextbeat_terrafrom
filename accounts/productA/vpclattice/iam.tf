@@ -60,3 +60,24 @@ resource "aws_iam_role_policy_attachment" "ecs_execution_role_policy_attachment"
   role       = aws_iam_role.ecs_execution_role.name
   policy_arn = aws_iam_policy.ecs_execution_role_policy.arn
 }
+
+/**
+ * Lambda関数用ロール
+ */
+data "aws_iam_policy_document" "assume_role_for_lambda" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+
+    actions = ["sts:AssumeRole"]
+  }
+}
+
+resource "aws_iam_role" "lambda_role" {
+  name               = "LambdaRole"
+  assume_role_policy = data.aws_iam_policy_document.assume_role_for_lambda.json
+}
