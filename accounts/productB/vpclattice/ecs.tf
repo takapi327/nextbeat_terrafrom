@@ -1,10 +1,14 @@
+data "aws_iam_role" "ecs_execution_role" {
+  name = "ECSExecutionRole"
+}
+
 resource "aws_ecs_cluster" "product_b_cluster" {
   name = "productB-cluster"
 }
 
 resource "aws_service_discovery_private_dns_namespace" "product_b_service_discovery_namespace" {
   name = "productB.internal"
-  vpc  = aws_vpc.product_b_vpc.id
+  vpc  = data.terraform_remote_state.product_b.outputs.product_b_vpc_id
 }
 
 resource "aws_service_discovery_service" "product_b_service_discovery" {
@@ -27,20 +31,20 @@ resource "aws_service_discovery_service" "product_b_service_discovery" {
 }
 
 resource "aws_ecs_task_definition" "fargate_spot_task" {
-  family                   = aws_ecr_repository.jvm_microservice_server.name
+  family                   = "jvm-microservice-server"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
-  task_role_arn            = aws_iam_role.ecs_execution_role.arn
-  execution_role_arn       = aws_iam_role.ecs_execution_role.arn
+  task_role_arn            = data.aws_iam_role.ecs_execution_role.arn
+  execution_role_arn       = data.aws_iam_role.ecs_execution_role.arn
   cpu                      = 512
   memory                   = 1024
   container_definitions = jsonencode([
     {
       networkMode       = "awsvpc"
       essential         = true
-      image             = "${data.aws_caller_identity.current.id}.dkr.ecr.ap-northeast-1.amazonaws.com/${aws_ecr_repository.jvm_microservice_server.name}:latest"
+      image             = "${data.aws_caller_identity.current.id}.dkr.ecr.ap-northeast-1.amazonaws.com/jvm-microservice-server:latest"
       memoryReservation = 1024
-      name              = aws_ecr_repository.jvm_microservice_server.name
+      name              = "jvm-microservice-server"
       environment = [
         {
           name  = "TZ"
@@ -51,7 +55,7 @@ resource "aws_ecs_task_definition" "fargate_spot_task" {
         logDriver = "awslogs"
         options = {
           awslogs-group         = aws_cloudwatch_log_group.ecs.name
-          awslogs-stream-prefix = aws_ecr_repository.jvm_microservice_server.name
+          awslogs-stream-prefix = "jvm-microservice-server"
           awslogs-region        = var.region
         }
       }
@@ -71,7 +75,7 @@ resource "aws_ecs_task_definition" "fargate_spot_task" {
 
 
 resource "aws_ecs_service" "product_b_service" {
-  name             = aws_ecr_repository.jvm_microservice_server.name
+  name             = "jvm-microservice-server"
   cluster          = aws_ecs_cluster.product_b_cluster.id
   desired_count    = 1
   platform_version = "LATEST"
@@ -88,12 +92,12 @@ resource "aws_ecs_service" "product_b_service" {
 
   load_balancer {
     target_group_arn = aws_lb_target_group.product_b_alb_target_group.arn
-    container_name   = aws_ecr_repository.jvm_microservice_server.name
+    container_name   = "jvm-microservice-server"
     container_port   = 9000
   }
 
   network_configuration {
-    subnets          = [ aws_subnet.sn_private_1.id ]
+    subnets          = [ data.terraform_remote_state.product_b.outputs.sn_private_1_id, ]
     security_groups  = [ aws_security_group.sg_ecs.id ]
     assign_public_ip = true
   }

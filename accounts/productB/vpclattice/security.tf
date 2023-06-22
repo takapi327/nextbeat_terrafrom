@@ -4,7 +4,7 @@
 resource "aws_security_group" "sg_alb" {
   name        = "security-alb"
   description = "Allow inbound"
-  vpc_id      = aws_vpc.product_b_vpc.id
+  vpc_id      = data.terraform_remote_state.product_b.outputs.product_b_vpc_id
 
   tags = {
     Name = "Security for ALB"
@@ -44,7 +44,7 @@ resource "aws_security_group_rule" "sg_alb_egress_rule" {
 resource "aws_security_group" "sg_ecs" {
   name        = "security-ecs"
   description = "Allow inbound ECS"
-  vpc_id      = aws_vpc.product_b_vpc.id
+  vpc_id      = data.terraform_remote_state.product_b.outputs.product_b_vpc_id
 
   tags = {
     Name = "Security for ECS"

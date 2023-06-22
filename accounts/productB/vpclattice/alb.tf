@@ -2,13 +2,16 @@ resource "aws_alb" "product_b_alb" {
   name               = "productB"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = [aws_security_group.sg_alb.id, aws_vpc.product_b_vpc.default_security_group_id]
-  subnets            = [aws_subnet.sn_global_1.id, aws_subnet.sn_global_2.id]
+  security_groups    = [
+    aws_security_group.sg_alb.id,
+    data.terraform_remote_state.product_b.outputs.product_b_vpc_default_security_group_id
+  ]
+  subnets = [
+    data.terraform_remote_state.product_b.outputs.sn_global_1_id,
+    data.terraform_remote_state.product_b.outputs.sn_global_2_id
+  ]
 
   enable_deletion_protection = false
-  depends_on = [
-    aws_vpc.product_b_vpc
-  ]
 }
 
 resource "aws_lb_listener" "product_b_alb_80" {
@@ -33,7 +36,7 @@ resource "aws_lb_target_group" "product_b_alb_target_group" {
   protocol             = "HTTP"
   deregistration_delay = "300"
   proxy_protocol_v2    = false
-  vpc_id               = aws_vpc.product_b_vpc.id
+  vpc_id               = data.terraform_remote_state.product_b.outputs.product_b_vpc_id
   target_type          = "ip"
 
   health_check {
