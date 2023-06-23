@@ -52,7 +52,7 @@ resource aws_wafv2_web_acl product_b_waf {
 
     // ルールのアクション
     action {
-      count {}
+      block {}
     }
 
     // AWS WAFがWebリクエストがルールにマッチするかどうかを判断するために使用する
