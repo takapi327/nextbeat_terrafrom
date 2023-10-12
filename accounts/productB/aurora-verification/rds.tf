@@ -1,7 +1,7 @@
 resource "aws_rds_cluster" "cluster" {
   cluster_identifier              = "aurora-cluster-stg"
   engine                          = "aurora-mysql"
-  engine_version                  = "5.7.mysql_aurora.2.07.2"
+  engine_version                  = "8.0.mysql_aurora.3.03.1"
   database_name                   = "aurora_stg"
   master_username                 = "takapi327"
   master_password                 = "takapi327"
@@ -25,7 +25,7 @@ resource "aws_rds_cluster_instance" "instance" {
   count                      = 2
   identifier                 = "aurora-cluster-stg-${count.index}"
   cluster_identifier         = aws_rds_cluster.cluster.id
-  instance_class             = "db.t3.small"
+  instance_class             = "db.t3.medium"
   engine                     = aws_rds_cluster.cluster.engine
   engine_version             = aws_rds_cluster.cluster.engine_version
   db_parameter_group_name    = aws_db_parameter_group.parameter.name
@@ -36,39 +36,14 @@ resource "aws_rds_cluster_instance" "instance" {
 
 resource "aws_rds_cluster_endpoint" "reader" {
   cluster_identifier          = aws_rds_cluster.cluster.id
-  cluster_endpoint_identifier = "ro-con-stg"
+  cluster_endpoint_identifier = "ro-stg"
   custom_endpoint_type        = "READER"
 }
 
 resource "aws_rds_cluster_parameter_group" "parameter" {
   name        = "rds-cluster-stg"
-  family      = "aurora-mysql5.7"
+  family      = "aurora-mysql8.0"
   description = "RDS default cluster parameter group"
-
-  parameter {
-    name  = "character_set_server"
-    value = "utf8mb4"
-  }
-
-  parameter {
-    name  = "character_set_connection"
-    value = "utf8mb4"
-  }
-
-  parameter {
-    name  = "character_set_database"
-    value = "utf8mb4"
-  }
-
-  parameter {
-    name  = "character_set_results"
-    value = "utf8mb4"
-  }
-
-  parameter {
-    name  = "character_set_client"
-    value = "utf8mb4"
-  }
 
   parameter {
     name  = "collation_connection"
@@ -113,7 +88,7 @@ resource "aws_rds_cluster_parameter_group" "parameter" {
 
 resource "aws_db_parameter_group" "parameter" {
   name        = "db-stg"
-  family      = "aurora-mysql5.7"
+  family      = "aurora-mysql8.0"
   description = "RDS default DB parameter group"
 
   parameter {
