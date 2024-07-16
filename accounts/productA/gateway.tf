@@ -5,6 +5,7 @@ resource "aws_internet_gateway" "igw" {
   }
 }
 
+/*
 resource "aws_eip" "eip" {}
 
 resource "aws_nat_gateway" "nat" {
@@ -15,3 +16,4 @@ resource "aws_nat_gateway" "nat" {
     Name : "ngw-productA"
   }
 }
+ */

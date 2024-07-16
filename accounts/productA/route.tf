@@ -28,6 +28,7 @@ resource "aws_route_table_association" "global_3" {
 }
 
 // ---------- [ Private Route Table ] -------------------------------
+/*
 resource "aws_route_table" "rtb_private" {
   vpc_id = aws_vpc.product_a_vpc.id
 
@@ -55,3 +56,4 @@ resource "aws_route_table_association" "private_3" {
   route_table_id = aws_route_table.rtb_private.id
   subnet_id      = aws_subnet.sn_private_3.id
 }
+ */
