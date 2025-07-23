@@ -65,3 +65,16 @@ resource "aws_subnet" "sn_private_3" {
     Name : "sn-private-3"
   }
 }
+
+resource "aws_db_subnet_group" "aurora_subnet_group" {
+  name       = "aurora-subnet-group"
+  subnet_ids = [
+    aws_subnet.sn_private_1.id,
+    aws_subnet.sn_private_2.id,
+    aws_subnet.sn_private_3.id
+  ]
+
+  tags = {
+    Name: "aurora-subnet-group"
+  }
+}
