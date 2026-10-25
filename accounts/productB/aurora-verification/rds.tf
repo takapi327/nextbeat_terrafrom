@@ -1,7 +1,7 @@
 resource "aws_rds_cluster" "cluster" {
   cluster_identifier              = "aurora-cluster-stg"
   engine                          = "aurora-mysql"
-  engine_version                  = "8.0.mysql_aurora.3.03.1"
+  engine_version                  = "8.0.mysql_aurora.3.10.1"
   database_name                   = "aurora_stg"
   master_username                 = "takapi327"
   master_password                 = "takapi327"
@@ -16,6 +16,7 @@ resource "aws_rds_cluster" "cluster" {
   deletion_protection             = false // terraform destroy で削除できるようにするための設定(本番では使用しない)
   skip_final_snapshot             = true  // terraform destroy で削除できるようにするための設定(本番では使用しない)
   backtrack_window                = 86400
+  iam_database_authentication_enabled = true
   lifecycle {
     ignore_changes = [master_password]
   }
