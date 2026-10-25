@@ -38,7 +38,7 @@ $ pnpm run-local
 
 - データは `.wrangler/` 配下に保存される（使い捨て可）
 - ローカルの workerd は自分のマシンの経路で外に出るため、VPN で届く先の MCP なら
-  この時点で `MCP_ALLOW_INSECURE=true` を併用して接続検証できる（ローカル開発専用スイッチ）
+  この時点で `MCP_ALLOW_INSECURE=true` を併用して接続検証できる（ローカル開発専用スイッチ。リポジトリ直下の `.dev.vars` に書く）
 
 ## ステップ 2: Cloudflare API トークンの作成
 
@@ -47,7 +47,7 @@ Cloudflare ダッシュボード → My Profile → API Tokens で、以下の�
 | スコープ | 権限 |
 |---|---|
 | Zone / 対象 zone | DNS: Edit, Zone WAF: Edit |
-| Account | Cloudflare Tunnel: Edit, Access: Apps and Policies: Edit, Access: Organizations: Edit, Access: Service Tokens: Edit |
+| Account | Cloudflare Tunnel: Edit, Access: Apps and Policies: Edit, Access: Organizations: Edit |
 
 作成したトークンは Terraform Cloud の workspace `platform-claudeflare` に
 環境変数 `CLOUDFLARE_API_TOKEN`（sensitive）として登録する。リポジトリには置かない。
@@ -181,7 +181,8 @@ resource "aws_security_group_rule" "https" {
 ```
 
 ```hcl
-# access.tf — Entra を IdP にし、os. は対象グループのみ、mcp. はサービストークンのみ許可する
+# access.tf — Entra を IdP にし、os. / mcp. とも対象グループのみ許可する。
+# mcp. は Managed OAuth で Access を OAuth 認可サーバーにする（README.md 3.5）
 resource "cloudflare_zero_trust_access_identity_provider" "entra" {
   account_id = var.cloudflare_account_id
   name       = "Entra ID"
@@ -218,32 +219,32 @@ resource "cloudflare_zero_trust_access_application" "cloudflare_os" {
   }]
 }
 
-# mcp. は Tunnel で公開されるため、Access をかけないとホスト名を知っている人が誰でも MCP を呼べる
-resource "cloudflare_zero_trust_access_service_token" "gatekeeper_mcp" {
-  account_id = var.cloudflare_account_id
-  name       = "gatekeeper-mcp"
-}
-
-resource "cloudflare_zero_trust_access_policy" "gatekeeper_mcp" {
-  account_id = var.cloudflare_account_id
-  name       = "gatekeeper-mcp-service-token"
-  decision   = "non_identity"
-  include = [{
-    service_token = {
-      token_id = cloudflare_zero_trust_access_service_token.gatekeeper_mcp.id
-    }
-  }]
-}
-
+# mcp. は Tunnel で公開されるため、Access をかけないとホスト名を知っている人が誰でも MCP を呼べる。
+# ポリシーは os. と同じ Entra グループを使い回す（MCP だけ別グループにしたい場合は別ポリシーを作る）
 resource "cloudflare_zero_trust_access_application" "mcp" {
   zone_id = var.zone_id
   name    = "mcp-sample-poc"
   type    = "self_hosted"
   domain  = "mcp.${var.domain}"
   policies = [{
-    id         = cloudflare_zero_trust_access_policy.gatekeeper_mcp.id
+    id         = cloudflare_zero_trust_access_policy.cloudflare_os_users.id
     precedence = 1
   }]
+
+  # Managed OAuth: 未認証のエージェントに 401 + WWW-Authenticate を返し、
+  # RFC 8414 / 9728 のメタデータと動的クライアント登録（RFC 7591）を提供する
+  oauth_configuration = {
+    enabled = true
+    dynamic_client_registration = {
+      enabled = true
+      # gatekeeper-mcp の OAuth コールバック `${BASE_URL}/oauth` を許可する
+      allowed_uris = ["https://os.${var.domain}/gatekeeper/mcp/*"]
+    }
+    grant = {
+      access_token_lifetime = "15m"   # Cloudflare 推奨は 5〜15 分
+      session_duration      = "168h"  # リフレッシュトークンの有効期間。推奨は 1〜2 週間
+    }
+  }
 }
 ```
 
@@ -297,13 +298,14 @@ output "tunnel_token" {
   sensitive = true
 }
 
-output "gatekeeper_mcp_client_id" {
-  value = cloudflare_zero_trust_access_service_token.gatekeeper_mcp.client_id
+# サンプル MCP が Cf-Access-Jwt-Assertion を検証するときの audience
+output "mcp_access_aud" {
+  value = cloudflare_zero_trust_access_application.mcp.aud
 }
 
-output "gatekeeper_mcp_client_secret" {
-  value     = cloudflare_zero_trust_access_service_token.gatekeeper_mcp.client_secret
-  sensitive = true
+# Cloudflare OS（workshop-backend）の CF_ACCESS_AUD に設定する値
+output "os_access_aud" {
+  value = cloudflare_zero_trust_access_application.cloudflare_os.aud
 }
 ```
 
@@ -333,6 +335,10 @@ services:
   mcp-sample:
     image: <サンプル MCP サーバーのイメージ>   # 例: 社内 API を数ツールだけ生やした最小実装。arm64 対応必須
     ports: ["3000:3000"]
+    environment:
+      # Cf-Access-Jwt-Assertion の検証に使う（README.md 3.5）。MCP サーバー自体は OAuth を実装しない
+      ACCESS_AUD: ${MCP_ACCESS_AUD}                                  # terraform output -raw mcp_access_aud
+      ACCESS_ISS: https://<チーム名>.cloudflareaccess.com          # JWKS は ${ACCESS_ISS}/cdn-cgi/access/certs
   cloudflared:
     image: cloudflare/cloudflared:latest
     command: tunnel run --token ${TUNNEL_TOKEN}   # terraform output -raw tunnel_token で取得（sensitive）
@@ -346,14 +352,16 @@ services:
 フォーク（[FORK.md](./FORK.md)）から wrangler でデプロイし、独自ドメインと Access 検証を設定する。
 
 1. `os.<ドメイン>` を Workers のカスタムドメインに割り当て、`workers.dev` ルートは無効化する
-2. Access の AUD / Issuer を Workers の環境変数に設定（`CF_ACCESS_AUD` / `CF_ACCESS_ISS`）
-   — Cloudflare OS 本体が `cf-access-jwt-assertion` を検証する実装を持っているため、これだけで Access 連携になる
-3. `gatekeeper-mcp` を有効化し、UI から `https://mcp.<ドメイン>` を MCP エンドポイントとして接続する。
-   `mcp.` には Access がかかっているため、リクエストに次のヘッダーを付ける必要がある
-   - `CF-Access-Client-Id`: `terraform output gatekeeper_mcp_client_id`
-   - `CF-Access-Client-Secret`: `terraform output -raw gatekeeper_mcp_client_secret`（`wrangler secret put` で設定する）
-   - `gatekeeper-mcp` が接続先ごとにカスタムヘッダーを設定できるかは要確認。できない場合は、ヘッダーを付ける
-     独自ゲートキーパーを `packages/gatekeeper-<name>/` に追加する（FORK.md 3 節の置き場所ルールに従う）
+2. Access の AUD / Issuer を workshop-backend の環境変数に設定する
+   - `CF_ACCESS_AUD`: `terraform output -raw os_access_aud`
+   - `CF_ACCESS_ISS`: `https://<チーム名>.cloudflareaccess.com`
+   — Cloudflare OS 本体（`packages/workshop-backend/src/access.ts`）が `cf-access-jwt-assertion` を検証するため、これだけで Access 連携になる
+3. `gatekeeper-mcp` の `BASE_URL` に `https://os.<ドメイン>/gatekeeper/mcp` を設定する。
+   OAuth のコールバックは `${BASE_URL}/oauth` で、既定値（`http://localhost:8787/gatekeeper/mcp`）のままだと
+   Access の `allowed_uris` に一致せず、動的クライアント登録が拒否される
+4. `gatekeeper-mcp` を有効化し、UI から `https://mcp.<ドメイン>` を MCP エンドポイントとして接続する。
+   ブラウザが Access のログイン（Entra ID）に遷移するので、対象グループのユーザーでログインして許可する。
+   接続はユーザーごとなので、MCP を使う人はそれぞれ一度この操作を行う
 
 簡易に済ませたい場合は公式デプロイフロー `https://os.cloudflare.app/deploy` も使えるが、
 フォークの検証という目的上、wrangler 直デプロイを基本とする。
@@ -364,8 +372,9 @@ README.md の「4. 検証項目」のチェックリストを上から順に実�
 特に以下の 3 点は本番提案の根拠になるため、スクリーンショットを残す。
 
 - AWS 側 SG が inbound 全拒否のまま MCP ツール呼び出しが成功すること
-- サービストークンなしで `https://mcp.<ドメイン>` を直接叩くと Access に拒否されること
-  （例: `curl -i https://mcp.<ドメイン>` が Access のログイン画面へのリダイレクトまたは 403 になる）
+- トークンなしで `https://mcp.<ドメイン>` を直接叩くと Access に拒否されること
+  （例: `curl -i https://mcp.<ドメイン>` が `401` と `WWW-Authenticate` ヘッダーを返す）
+- 対象の Entra グループに入っていないユーザーが MCP を接続しようとすると、OAuth のログインで拒否されること
 - 共有した Gadget が、MCP 権限のないユーザーには開けないこと（observer 検証）
 
 ## ステップ 8: 片付け
